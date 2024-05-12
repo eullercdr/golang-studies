@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/eullercdr/math/math"
+	"github.com/google/uuid"
 )
 
 func main() {
@@ -15,4 +16,5 @@ func main() {
 		Year:  2021,
 	}
 	fmt.Println("Car:", car)
+	println(uuid.New().String())
 }
