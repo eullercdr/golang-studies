@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 
 	_ "github.com/go-sql-driver/mysql" //underscore is used to import a package only for its side effects
 
@@ -43,6 +44,17 @@ func main() {
 		panic(err)
 	}
 	println(p.Name, p.Price)
+	err = RemoveProduct(db, product.ID)
+	if err != nil {
+		panic(err)
+	}
+	products, err := findAll(db)
+	if err != nil {
+		panic(err)
+	}
+	for _, p := range products {
+		fmt.Printf("Product: %s, Price: %f\n", p.Name, p.Price)
+	}
 }
 
 func InsertProduct(db *sql.DB, p *Product) error {
@@ -83,4 +95,35 @@ func findOneProduct(db *sql.DB, id string) (*Product, error) {
 		return nil, err
 	}
 	return &p, nil
+}
+
+func findAll(db *sql.DB) ([]Product, error) {
+	rows, err := db.Query("SELECT id, name, price FROM products")
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var products []Product
+	for rows.Next() {
+		var p Product
+		err := rows.Scan(&p.ID, &p.Name, &p.Price)
+		if err != nil {
+			return nil, err
+		}
+		products = append(products, p)
+	}
+	return products, nil
+}
+
+func RemoveProduct(db *sql.DB, id string) error {
+	stmt, err := db.Prepare("DELETE FROM products WHERE id=?")
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+	_, err = stmt.Exec(id)
+	if err != nil {
+		return err
+	}
+	return nil
 }
