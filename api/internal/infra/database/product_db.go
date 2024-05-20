@@ -10,9 +10,7 @@ type Product struct {
 }
 
 func NewProduct(db *gorm.DB) *Product {
-	return &Product{
-		DB: db,
-	}
+	return &Product{DB: db}
 }
 
 func (p *Product) Create(product *entity.Product) error {
