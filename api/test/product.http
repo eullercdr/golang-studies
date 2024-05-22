@@ -1,0 +1,2 @@
+GET http://localhost:8080/products HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MTY1NTg2MzIsInN1YiI6IjI0OGE0ODQwLTExMTgtNDdkYS05OWQxLTFjMzZjN2MyMTkwNyJ9.WB4_gaxoAt4xMceoBhBlD9trmlzYO0iyynvsukHzcCQ
