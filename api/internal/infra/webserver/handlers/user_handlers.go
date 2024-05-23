@@ -27,6 +27,18 @@ type Error struct {
 	Message string `json:"message"`
 }
 
+// GetJWT godoc
+// @Summary Get JWT
+// @Description Get JWT
+// @Tags users
+// @Accept  json
+// @Produce  json
+// @Param request body dto.GetJwtInput true "user request"
+// @Success 200 {object} dto.GetJWTOutput
+// @Failure 404 {object} Error
+// @Failure 400 {object} Error
+// @Failure 500 {object} Error
+// @Router /users/generate_token [post]
 func (h *UserHandler) GetJWT(w http.ResponseWriter, r *http.Request) {
 	jwt := r.Context().Value("jwt").(*jwtauth.JWTAuth)
 	jwtExpiriesIn := r.Context().Value("jwtExpiriesIn").(int)
@@ -41,21 +53,21 @@ func (h *UserHandler) GetJWT(w http.ResponseWriter, r *http.Request) {
 	u, err := h.UserDb.FindByEmail(user.Email)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusUnauthorized)
+		error := Error{Message: err.Error()}
+		json.NewEncoder(w).Encode(error)
 		return
 	}
 	if !u.ValidatePassword(user.Password) {
 		http.Error(w, "invalid password", http.StatusUnauthorized)
+		error := Error{Message: "invalid password"}
+		json.NewEncoder(w).Encode(error)
 		return
 	}
 	_, tokenString, _ := jwt.Encode(map[string]interface{}{
 		"sub": u.ID.String(),
 		"exp": time.Now().Add(time.Minute * time.Duration(jwtExpiriesIn)).Unix(),
 	})
-	accessToken := struct {
-		AcessToken string `json:"access_token"`
-	}{
-		AcessToken: tokenString,
-	}
+	accessToken := dto.GetJWTOutput{AccessToken: tokenString}
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(accessToken)
 }
